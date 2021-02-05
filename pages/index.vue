@@ -22,12 +22,9 @@
           </div>
         </div>
       </div>
-    </section>
-    <section class="panierTest">
-      <div v-for="(cart,idCart) in carts" :key="idCart">{{ cart }}</div>
-      <button @click="order()"></button>
+    </section>  
       <panier :carts = "carts" :products= "products" v-on:payer-panier="order"/>
-    </section>
+   
   </div>
 </template>
 

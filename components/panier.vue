@@ -3,7 +3,7 @@
     <b-button v-b-modal.modal-scrollable>Panier</b-button>
 
     <b-modal id="modal-scrollable" scrollable title="BootstrapVue" hide-footer>
-      <div v-for="product in products" class="my-4">
+      <div v-for="(product,idProductPanier) in findCartProduct()" :key="idProductPanier" class="my-4">
         <div class="containerCart" >
           <div class="rowCart">
             <img
@@ -38,7 +38,13 @@ export default {
       alert("cc");
       this.$emit('payer-panier', "payer")
     },
+    findCartProduct() {
+      return this.products.filter(product => this.carts.map(item => item.product_id).includes(product.id));
+    }
   },
+  computed: {
+    
+  }
 };
 </script>
 
