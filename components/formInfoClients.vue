@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <h2>Facturation :</h2>
-    <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+    <b-form @reset="onReset" v-if="show">
       <b-form-group
         id="input-group-2"
         label="Votre prénom :"
@@ -108,17 +108,11 @@ export default {
         email: "john.doe@example.com",
         phone: "(555) 555-5555",
       },
-      carts: {
-        product: {},
-        product_id: "",
-        quantity: "",
-      },
+      carts: [],
       show: true,
       token: "",
       finalBilling: [],
       finalCarts: [],
-      idCartID: [],
-      idCartQuantity: [],
     };
   },
   mounted() {
@@ -140,11 +134,6 @@ export default {
       let parsed = JSON.stringify(this.formBilling);
       localStorage.setItem("formBilling", parsed);
     },
-    onSubmit(event) {
-      event.preventDefault();
-      alert(JSON.stringify(this.formBilling));
-      this.saveFormBilling();
-    },
     onReset(event) {
       event.preventDefault();
       // Reset our form values
@@ -158,19 +147,14 @@ export default {
     },
     validation() {
       this.saveFormBilling();
-      (this.formBilling = localStorage.getItem("formBilling")),
-        (this.finalBilling = JSON.parse(this.formBilling)),
-        (this.carts = localStorage.getItem("carts")),
-        (this.finalCarts = JSON.parse(this.carts));
-      //   console.log(this.finalCarts[test].product_id) // affiche undefined au lieu de l'id du produit
-      for (var i = 0; i < this.finalCarts.length; i++) {
-        this.idCartID.push(this.finalCarts[i].product_id);
-        this.idCartQuantity.push(this.finalCarts[i].quantity);
-      }
-      console.log(this.idCartQuantity);
+      this.formBilling = localStorage.getItem("formBilling");
+      this.finalBilling = JSON.parse(this.formBilling);
+      this.carts = localStorage.getItem("cartsIDQuant");
+      this.finalCarts[0] = JSON.parse(this.carts);
     },
     // CREER UNE COMMANDE
     order() {
+      console.log(this.finalCarts);
       axios
         .post(
           "http://applicommande.local/wp-json/wc/v3/orders",
@@ -200,12 +184,7 @@ export default {
               postcode: "94103",
               country: "US",
             },
-            line_items: [
-              {
-                product_id: this.idCart,
-                quantity: this.idCartQuantity,
-              },
-            ],
+            line_items: this.finalCarts[0],
             shipping_lines: [
               {
                 method_id: "flat_rate",

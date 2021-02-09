@@ -42,6 +42,7 @@ export default {
       products: [],
       token: "",
       carts: [],
+      cartsIDQuant: [],
       quantiteProduct: 1,
     };
   },
@@ -88,7 +89,10 @@ export default {
         product_id: product.id,
         quantity: this.quantiteProduct,
       });
-      console.log(this.carts);
+      this.cartsIDQuant.push({
+        product_id: product.id,
+        quantity: this.quantiteProduct,
+      });
       this.saveCarts();
     },
 
@@ -96,50 +100,14 @@ export default {
     saveCarts() {
       let parsed = JSON.stringify(this.carts);
       localStorage.setItem("carts", parsed);
-    },
-    
-    // CREER UNE COMMANDE
-    order() {
-      axios
-        .post(
-          "http://applicommande.local/wp-json/wc/v3/orders",
-          {
-            payment_method: "bacs",
-            payment_method_title: "Direct Bank Transfer",
-            set_paid: false,
-            billing: localStorage.getItem('formBilling'),
-            shipping: {
-              first_name: "john",
-              last_name: "Doe",
-              address_1: "969 Market",
-              address_2: "",
-              city: "San Francisco",
-              state: "CA",
-              postcode: "94103",
-              country: "US",
-            },
-            line_items: this.carts,
-            shipping_lines: [
-              {
-                method_id: "flat_rate",
-                method_title: "Flat Rate",
-                total: "10.00",
-              },
-            ],
-          },
-          { headers: { Authorization: "Bearer" + this.token } }
-        )
-        .then((response) => console.log(response.data))
-        .catch((error) => console.log(error.response));
-      this.cart = [];
+      let parsedIDQuant = JSON.stringify(this.cartsIDQuant);
+      localStorage.setItem("cartsIDQuant", parsedIDQuant);
     },
   },
 };
 </script>
 
 <style>
-.col {
-}
 .content {
   display: flex;
   flex-wrap: wrap;
