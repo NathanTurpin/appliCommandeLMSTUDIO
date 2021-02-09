@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <section id="app" class="content">
-      <div v-for="(product,idProduct) in products" :key="idProduct">
+      <div v-for="(product, idProduct) in products" :key="idProduct">
         <div class="col">
           <div class="card">
             <img
@@ -14,17 +14,18 @@
               <h5 class="card-title">{{ product.name }}</h5>
               <p class="card-text" v-html="product.description"></p>
               <p class="card-text" v-html="product.price_html"></p>
-
-              <button @click="addToCart(product.id,idProduct)">
+              <button @click="quantite()">-</button>
+              <p>{{ quantiteProduct }}</p>
+              <button @click="quantiteProduct += 1">+</button>
+              <button @click="addToCart(product)">
                 {{ product.add_to_cart.text }}
               </button>
             </div>
           </div>
         </div>
       </div>
-    </section>  
-      <panier :carts = "carts" :products= "products" v-on:payer-panier="order"/>
-   
+    </section>
+    <panier :carts="carts" :products="products" v-on:payer-panier="order" />
   </div>
 </template>
 
@@ -41,10 +42,12 @@ export default {
       products: [],
       token: "",
       carts: [],
+      quantiteProduct: 1,
     };
   },
   mounted() {
     this.getProduct();
+    // TOKEN
     axios
       .post("http://applicommande.local/wp-json/jwt-auth/v1/token", {
         username: "admin",
@@ -55,21 +58,47 @@ export default {
         console.log(this.token)
       )
       .catch((error) => console.log(error.response));
+
+    if (localStorage.getItem("products")) {
+      try {
+        this.products = JSON.parse(localStorage.getItem("products"));
+      } catch (e) {
+        localStorage.removeItem("products");
+      }
+    }
   },
   methods: {
+    quantite() {
+      if (this.quantiteProduct > 1) {
+        this.quantiteProduct -= 1;
+      }
+    },
+    // AFFICHE LES PRODUITS
     getProduct() {
       axios
         .get("http://applicommande.local/wp-json/wc/store/products")
         .then((response) => (this.products = response.data))
         .catch((error) => console.log(error));
     },
-    addToCart(id) {
+
+    // AJOUT LES PRODUITS SELECTIONNES A LA CART
+    addToCart(product) {
       this.carts.push({
-        product_id: id,
-        quantity: 1,
+        product,
+        product_id: product.id,
+        quantity: this.quantiteProduct,
       });
-       console.log(id)
+      console.log(this.carts);
+      this.saveCarts();
     },
+
+    //SAVE CARTS DS LOCAL STORAGE
+    saveCarts() {
+      let parsed = JSON.stringify(this.carts);
+      localStorage.setItem("carts", parsed);
+    },
+    
+    // CREER UNE COMMANDE
     order() {
       axios
         .post(

@@ -3,48 +3,52 @@
     <b-button v-b-modal.modal-scrollable>Panier</b-button>
 
     <b-modal id="modal-scrollable" scrollable title="BootstrapVue" hide-footer>
-      <div v-for="(product,idProductPanier) in findCartProduct()" :key="idProductPanier" class="my-4">
+      <div
+        v-for="(cart, idCartPanier) in carts"
+        :key="idCartPanier"
+        class="my-4"
+      >
         <div class="containerCart" >
           <div class="rowCart">
             <img
-              v-if="product.images[0] !== undefined"
-              :src="product.images[0].thumbnail"
+              v-if="cart.product.images[0] !== undefined"
+              :src="cart.product.images[0].thumbnail"
               alt=""
               class="cart-img"
             />
 
-            {{ product.name }}
-            <!-- {{ cart.quantity }} -->
-           
+            {{ cart.product.name }}
+            {{cart.quantity}}
           </div>
-            <div class="rowCartPrice" v-html="product.price_html"></div>
-
+          <div class="rowCartPrice" v-html="cart.product.price_html"></div>
         </div>
+
       </div>
-      <b-button class="mt-3" block @click="test">Payer</b-button>
+      <b-button class="mt-3" block @click="commande(product)">Commander</b-button>
+
     </b-modal>
   </div>
 </template>
 
 <script>
 export default {
+  
   name: "panier",
   props: ["carts", "products"],
   data() {
-    return {};
+    return {  };
+  }, mounted() {
+    
+    
   },
   methods: {
-    test() {
-      alert("cc");
-      this.$emit('payer-panier', "payer")
-    },
-    findCartProduct() {
-      return this.products.filter(product => this.carts.map(item => item.product_id).includes(product.id));
+   
+    commande(product) {
+      window.location.href = "/formCommande";
+      // this.$emit("commande-panier", product);
     }
   },
-  computed: {
-    
-  }
+  computed: {},
 };
 </script>
 
@@ -57,7 +61,7 @@ img {
   flex-wrap: wrap;
 }
 .rowCart {
-flex: 3 1 0;
+  flex: 3 1 0;
 }
 .rowCartPrice {
   flex: 1 1 0;
