@@ -137,9 +137,10 @@ export default {
             password: this.passwordLogin,
           }
         );
-localStorage.setItem("token", response.data.token)
-     
-        return   this.test() ;
+    localStorage.setItem("token", response.data.token)
+    localStorage.setItem("username",response.data.user_nicename)
+    localStorage.setItem("role",response.data.role)
+         return  this.test() ;
       }
     },
      test(){
@@ -167,7 +168,6 @@ localStorage.setItem("token", response.data.token)
               username: this.usernameReg,
               email: this.emailReg,
               password: this.passwordReg,
-              roles: ["client"],
             },
             { headers: { Authorization: "Bearer " + this.token } }
           )

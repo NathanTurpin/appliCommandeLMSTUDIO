@@ -45,7 +45,6 @@ export default {
    
     commande(product) {
       window.location.href = "/formCommande";
-      // this.$emit("commande-panier", product);
     }
   },
   computed: {},

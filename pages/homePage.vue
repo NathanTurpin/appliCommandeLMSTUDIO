@@ -25,7 +25,7 @@
         </div>
       </div>
     </section>
-    <panier :carts="carts" :products="products" v-on:payer-panier="order" />
+    <panier :carts="carts" :products="products"  />
   </div>
 </template>
 
