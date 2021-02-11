@@ -1,119 +1,236 @@
 <template>
-  <div class="main">
-    <section id="app" class="content">
-      <div v-for="(product, idProduct) in products" :key="idProduct">
-        <div class="col">
-          <div class="card">
-            <img
-              v-if="product.images[0] !== undefined"
-              :src="product.images[0].thumbnail"
-              alt=""
-              class="card-img-top"
-            />
-            <div class="card-body">
-              <h5 class="card-title">{{ product.name }}</h5>
-              <p class="card-text" v-html="product.description"></p>
-              <p class="card-text" v-html="product.price_html"></p>
-              <button @click="quantite()">-</button>
-              <p>{{ quantiteProduct }}</p>
-              <button @click="quantiteProduct += 1">+</button>
-              <button @click="addToCart(product)">
-                {{ product.add_to_cart.text }}
-              </button>
+  <div id="app">
+    <div class="login-page">
+      <transition name="fade">
+        <div v-if="!registerActive" class="wallpaper-login"></div>
+      </transition>
+      <div class="wallpaper-register"></div>
+
+      <div div class="container">
+        <div class="row">
+          <div class="col-lg-4 col-md-6 col-sm-8 mx-auto">
+            <div
+              v-if="!registerActive"
+              class="card login"
+              v-bind:class="{ error: emptyFields }"
+            >
+              <h1>Connexion</h1>
+              <form class="form-group">
+                <input
+                  v-model="username"
+                  type="username"
+                  class="form-control"
+                  placeholder="username"
+                  required
+                />
+
+                <input
+                  v-model="passwordLogin"
+                  type="password"
+                  class="form-control"
+                  placeholder="Password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  @click="doLogin"
+                />
+                <p>
+                  Don't have an account?
+                  <a
+                    href="#"
+                    @click="
+                      (registerActive = !registerActive), (emptyFields = false)
+                    "
+                    >Sign up here</a
+                  >
+                </p>
+                <p><a href="#">Forgot your password?</a></p>
+              </form>
+            </div>
+
+            <div
+              v-else
+              class="card register"
+              v-bind:class="{ error: emptyFields }"
+            >
+              <h1>Inscription</h1>
+              <form class="form-group">
+                <input
+                  v-model="usernameReg"
+                  type="username"
+                  class="form-control"
+                  placeholder="usernameReg"
+                  required
+                />
+                <input
+                  v-model="emailReg"
+                  type="email"
+                  class="form-control"
+                  placeholder="Email"
+                  required
+                />
+                <input
+                  v-model="passwordReg"
+                  type="password"
+                  class="form-control"
+                  placeholder="Password"
+                  required
+                />
+                <input
+                  type="button"
+                  class="btn btn-primary"
+                  @click="doRegister"
+                />
+                <p>
+                  Already have an account?
+                  <a
+                    href="#"
+                    @click="
+                      (registerActive = !registerActive), (emptyFields = false)
+                    "
+                    >Sign in here</a
+                  >
+                </p>
+              </form>
             </div>
           </div>
         </div>
       </div>
-    </section>
-    <panier :carts="carts" :products="products" v-on:payer-panier="order" />
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import panier from "@/components/panier";
 
 export default {
-  components: {
-    panier,
-  },
   data() {
     return {
-      products: [],
+      //   actu: {
+      //       title: '',
+      //       content: '',
+      //       status: ''
+      //     },
+      registerActive: false,
+      username: "",
+      passwordLogin: "",
+      usernameReg: "",
+      emailReg: "",
+      passwordReg: "",
+      confirmReg: "",
+      emptyFields: false,
       token: "",
-      carts: [],
-      cartsIDQuant: [],
-      quantiteProduct: 1,
     };
   },
-  mounted() {
-    this.getProduct();
-    // TOKEN
-    axios
-      .post("http://applicommande.local/wp-json/jwt-auth/v1/token", {
-        username: "admin",
-        password: "admin",
-      })
-      .then(
-        (response) => (this.token = response.data.token),
-        console.log(this.token)
-      )
-      .catch((error) => console.log(error.response));
-
-    if (localStorage.getItem("products")) {
-      try {
-        this.products = JSON.parse(localStorage.getItem("products"));
-      } catch (e) {
-        localStorage.removeItem("products");
-      }
-    }
-  },
+  mounted() {},
   methods: {
-    quantite() {
-      if (this.quantiteProduct > 1) {
-        this.quantiteProduct -= 1;
+    async doLogin() {
+      if (this.username === "" || this.passwordLogin === "") {
+        this.emptyFields = true;
+      } else {
+        const response = await axios.post(
+          "http://applicommande.local/wp-json/jwt-auth/v1/token",
+          {
+            username: this.username,
+            password: this.passwordLogin,
+          }
+        );
+localStorage.setItem("token", response.data.token)
+     
+        return   this.test() ;
       }
     },
-    // AFFICHE LES PRODUITS
-    getProduct() {
-      axios
-        .get("http://applicommande.local/wp-json/wc/store/products")
-        .then((response) => (this.products = response.data))
-        .catch((error) => console.log(error));
+     test(){
+       let token = localStorage.getItem('token')
+      if(token) {
+              window.location.href = "/homePage";
+
+      }else{
+        alert('non')
+      }
     },
 
-    // AJOUT LES PRODUITS SELECTIONNES A LA CART
-    addToCart(product) {
-      this.carts.push({
-        product,
-        product_id: product.id,
-        quantity: this.quantiteProduct,
-      });
-      this.cartsIDQuant.push({
-        product_id: product.id,
-        quantity: this.quantiteProduct,
-      });
-      this.saveCarts();
-    },
-
-    //SAVE CARTS DS LOCAL STORAGE
-    saveCarts() {
-      let parsed = JSON.stringify(this.carts);
-      localStorage.setItem("carts", parsed);
-      let parsedIDQuant = JSON.stringify(this.cartsIDQuant);
-      localStorage.setItem("cartsIDQuant", parsedIDQuant);
+    doRegister() {
+      if (
+        this.usernameReg === "" ||
+        this.emailReg === "" ||
+        this.passwordReg === ""
+      ) {
+        this.emptyFields = true;
+      } else {
+        axios
+          .post(
+            "http://applicommande.local/wp-json/wp/v2/users",
+            {
+              username: this.usernameReg,
+              email: this.emailReg,
+              password: this.passwordReg,
+              roles: ["client"],
+            },
+            { headers: { Authorization: "Bearer " + this.token } }
+          )
+          .then((response) => console.log(response.data))
+          .catch((error) => console.log(error.response));
+      }
     },
   },
 };
 </script>
 
-<style>
-.content {
-  display: flex;
-  flex-wrap: wrap;
+<style scoped>
+p {
+  line-height: 1rem;
 }
+
 .card {
-  width: 60%;
-  min-height: 50vh;
+  padding: 20px;
+}
+
+.form-group input {
+  margin-bottom: 20px;
+}
+
+.login-page {
+  align-items: center;
+  display: flex;
+  height: 100vh;
+}
+
+.login-page .fade-enter-active,
+.login-page .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.login-page .fade-enter,
+.login-page .fade-leave-to {
+  opacity: 0;
+}
+
+.login-page h1 {
+  margin-bottom: 1.5rem;
+}
+
+.error {
+  animation-name: errorShake;
+  animation-duration: 0.3s;
+}
+
+@keyframes errorShake {
+  0% {
+    transform: translateX(-25px);
+  }
+  25% {
+    transform: translateX(25px);
+  }
+  50% {
+    transform: translateX(-25px);
+  }
+  75% {
+    transform: translateX(25px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 </style>
