@@ -26,9 +26,19 @@
           </a>
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <nuxt-link v-if="!token" class="nav-link active" aria-current="page" to="/">
-                <h4>Appli Commande</h4>
-              </nuxt-link><nuxt-link v-else class="nav-link active" aria-current="page" to="/homePage">
+              <nuxt-link
+                v-if="!token"
+                class="nav-link active"
+                aria-current="page"
+                to="/"
+              >
+                <h4>Appli Commande</h4> </nuxt-link
+              ><nuxt-link
+                v-else
+                class="nav-link active"
+                aria-current="page"
+                to="/homePage"
+              >
                 <h4>Appli Commande</h4>
               </nuxt-link>
             </li>
@@ -46,8 +56,15 @@
             </li>
             <h4>
               <b-nav-item-dropdown :text="this.username" right>
-                <div v-if="roleChecked"> admin </div>
-                 <div v-else> client</div>
+                <div v-if="roleChecked">
+                  admin
+                  <b-dropdown-divider></b-dropdown-divider>
+                 <b-dropdown-item>   <nuxt-link to="/commandesAdmin"> Commandes </nuxt-link></b-dropdown-item> 
+                  <b-dropdown-item>Second Action</b-dropdown-item>
+                  <b-dropdown-item>Third Action</b-dropdown-item>
+                </div>
+                <div v-else>client</div>
+                <b-dropdown-divider></b-dropdown-divider>
                 <b-dropdown-item @click="logout">Deconnexion</b-dropdown-item>
               </b-nav-item-dropdown>
             </h4>
@@ -85,27 +102,27 @@ export default {
     return {
       username: localStorage.getItem("username"),
       token: localStorage.getItem("token"),
-      roleChecked : false
+      roleChecked: false,
     };
   },
   mounted() {
-    this.roleChecking()
+    this.roleChecking();
   },
   methods: {
-    roleChecking(){
+    roleChecking() {
       let role = localStorage.getItem("role");
-      
-      if(role === "administrator") {
-        this.roleChecked = true
-      }else {
-        this.roleChecked = false
+
+      if (role === "administrator") {
+        this.roleChecked = true;
+      } else {
+        this.roleChecked = false;
       }
     },
-    logout(){
+    logout() {
       localStorage.clear();
-      window.location.href="/"
-    }
-  }
+      window.location.href = "/";
+    },
+  },
 };
 </script>
 

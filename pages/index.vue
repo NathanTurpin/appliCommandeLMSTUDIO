@@ -121,10 +121,12 @@ export default {
       passwordReg: "",
       confirmReg: "",
       emptyFields: false,
-      token: "",
+      token: ""
     };
   },
-  mounted() {},
+  mounted() {
+    this.doRegister()
+  },
   methods: {
     async doLogin() {
       if (this.username === "" || this.passwordLogin === "") {
@@ -144,7 +146,7 @@ export default {
       }
     },
      test(){
-       let token = localStorage.getItem('token')
+       let token = localStorage.getItem('token');
       if(token) {
               window.location.href = "/homePage";
 
@@ -154,6 +156,19 @@ export default {
     },
 
     doRegister() {
+      // TOKEN
+    axios
+      .post("http://applicommande.local/wp-json/jwt-auth/v1/token", {
+        username: "admin",
+        password: "admin",
+      })
+      .then(
+        (response) => (this.token = response.data.token),
+        console.log(this.token)
+      )
+      .catch((error) => console.log(error.response));
+
+    // inscription
       if (
         this.usernameReg === "" ||
         this.emailReg === "" ||
@@ -174,6 +189,8 @@ export default {
           .then((response) => console.log(response.data))
           .catch((error) => console.log(error.response));
       }
+      this.token=""
+
     },
   },
 };

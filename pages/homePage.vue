@@ -14,7 +14,7 @@
               <h5 class="card-title">{{ product.name }}</h5>
               <p class="card-text" v-html="product.description"></p>
               <p class="card-text" v-html="product.price_html"></p>
-              <button @click="quantite()">-</button>
+              <button @click="quantite(idProduct)">-</button>
               <p>{{ quantiteProduct }}</p>
               <button @click="quantiteProduct += 1">+</button>
               <button @click="addToCart(product)">
@@ -69,7 +69,7 @@ export default {
     }
   },
   methods: {
-    quantite() {
+    quantite(id) {
       if (this.quantiteProduct > 1) {
         this.quantiteProduct -= 1;
       }
@@ -77,7 +77,7 @@ export default {
     // AFFICHE LES PRODUITS
     getProduct() {
       axios
-        .get("http://applicommande.local/wp-json/wc/store/products")
+        .get("https://applicommande.local/wp-json/wc/store/products")
         .then((response) => (this.products = response.data))
         .catch((error) => console.log(error));
     },
